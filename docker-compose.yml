@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  django:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app/backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  react:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+    command: sh -c "cd app && npm start"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - django
+
+  db:
+    image: postgres:16
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=dbname
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
